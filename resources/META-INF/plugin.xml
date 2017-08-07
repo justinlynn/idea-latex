@@ -1,0 +1,157 @@
+<idea-plugin version="2">
+    <id>mobi.hsz.idea.latex</id>
+    <name>LaTeX</name>
+    <version>0.2</version>
+    <vendor email="jakub@hsz.mobi" url="http://www.hsz.mobi">hsz</vendor>
+
+    <description><![CDATA[
+      <h1>LaTeX plugin for IntelliJ IDEA</h1>
+      <br/>
+
+      <a href="https://github.com/hsz/idea-latex">GitHub</a> |
+      <a href="https://github.com/hsz/idea-latex/issues">Issues</a> | Donate (
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=V6QCW4DR2XWY4">PayPal</a> or
+      <a href="https://blockchain.info/address/1BUbqKrUBmGGSnMybzGCsJyAWJbh4CcwE1">BTC</a> )
+      <br/>
+      <br/>
+
+      <b>Features</b>
+      <ul>
+        <li>Syntax highlighting</li>
+        <li>Editor toolbar actions with shortcuts</li>
+        <li>Code folding</li>
+      </ul>
+
+      <b><i>Feature requests:</i></b>
+      <ul>
+        <li><i>suggesting functions' names</i></li>
+        <li><i>obtaining installed packages</i></li>
+        <li><i>generating PDF files</i></li>
+        <li><i>preview generated PDF files</i></li>
+        <li><i>and more...</i></li>
+      </ul>
+
+      <br/>
+      <br/>
+
+      <i>Compiled with Java 1.6</i>
+      <br/>
+      <br/>
+
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Version 0.2
+      <ul>
+        <li>Toolbar actions: bold, italic, underline, align left, align center, align right</li>
+        <li>Color settings page</li>
+        <li>Sections folding</li>
+      </ul>
+
+      Version 0.1.1
+      <ul>
+        <li>Fixed syntax highlighting (better BNF and Flex rules)</li>
+      </ul>
+
+      Version 0.1
+      <ul>
+        <li>Basic syntax highlighting</li>
+      </ul>
+    ]]>
+    </change-notes>
+
+    <idea-version since-build="123.72"/>
+    <depends>com.intellij.modules.lang</depends>
+    <resource-bundle>messages.LatexBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <additionalTextAttributes
+                file="colorSchemes/LatexDefault.xml"
+                scheme="Default"/>
+        <additionalTextAttributes
+                file="colorSchemes/LatexDarcula.xml"
+                scheme="Darcula"/>
+
+        <codeStyleSettingsProvider
+                implementation="mobi.hsz.idea.latex.codeStyle.LatexCodeStyleSettingsProvider"/>
+
+        <colorSettingsPage
+                implementation="mobi.hsz.idea.latex.highlighter.LatexColorSettingsPage"/>
+
+        <fileTemplateGroup
+                implementation="mobi.hsz.idea.latex.actions.LatexTemplatesFactory"/>
+        <fileTypeFactory
+                implementation="mobi.hsz.idea.latex.file.LatexFileTypeFactory"/>
+
+        <lang.braceMatcher
+                implementationClass="mobi.hsz.idea.latex.lang.LatexBraceMatcher"
+                language="LaTeX"/>
+        <lang.commenter
+                implementationClass="mobi.hsz.idea.latex.lang.LatexCommenter"
+                language="LaTeX"/>
+        <lang.foldingBuilder
+                implementationClass="mobi.hsz.idea.latex.folding.LatexFoldingBuilder"
+                language="LaTeX"/>
+        <lang.parserDefinition
+                implementationClass="mobi.hsz.idea.latex.lang.LatexParserDefinition"
+                language="LaTeX"/>
+        <lang.syntaxHighlighterFactory
+                implementationClass="mobi.hsz.idea.latex.highlighter.LatexHighlighterFactory"
+                key="LaTeX"/>
+
+        <langCodeStyleSettingsProvider
+                implementation="mobi.hsz.idea.latex.codeStyle.LatexLanguageCodeStyleSettingsProvider"/>
+
+        <psi.referenceContributor
+                implementation="mobi.hsz.idea.latex.reference.LatexReferenceContributor"
+                language="LaTeX"/>
+
+        <spellchecker.support
+                implementationClass="mobi.hsz.idea.latex.inspections.LatexSpellcheckingStrategy"
+                language="LaTeX"/>
+
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <component>
+            <implementation-class>mobi.hsz.idea.latex.editor.LatexEditorActionsLoaderComponent</implementation-class>
+            <skipForDefaultProject/>
+        </component>
+    </project-components>
+
+    <actions>
+        <group id="latex.new" text="LaTeX">
+            <action id="latex.new.file" class="mobi.hsz.idea.latex.actions.CreateLatexFileAction"/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+        </group>
+
+        <group id="latex.editor" text="LaTeX">
+            <action id="latex.editor.bold" class="mobi.hsz.idea.latex.actions.editor.BoldAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="B"/>
+            </action>
+            <action id="latex.editor.italic" class="mobi.hsz.idea.latex.actions.editor.ItalicAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="I"/>
+            </action>
+            <action id="latex.editor.underline" class="mobi.hsz.idea.latex.actions.editor.UnderlineAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="U"/>
+            </action>
+            <action id="latex.editor.align_left" class="mobi.hsz.idea.latex.actions.editor.AlignLeftAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="L"/>
+            </action>
+            <action id="latex.editor.align_center" class="mobi.hsz.idea.latex.actions.editor.AlignCenterAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="C"/>
+            </action>
+            <action id="latex.editor.align_right" class="mobi.hsz.idea.latex.actions.editor.AlignRightAction">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl L" second-keystroke="R"/>
+            </action>
+            <action id="latex.editor.image" class="mobi.hsz.idea.latex.actions.editor.ImageAction"/>
+            <action id="latex.editor.matrix" class="mobi.hsz.idea.latex.actions.editor.MatrixAction"/>
+            <action id="latex.editor.table" class="mobi.hsz.idea.latex.actions.editor.TableAction"/>
+        </group>
+    </actions>
+</idea-plugin>

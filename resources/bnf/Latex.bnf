@@ -1,0 +1,76 @@
+{
+  parserClass               = "mobi.hsz.idea.latex.parser.LatexParser"
+  parserUtilClass           = "mobi.hsz.idea.latex.parser.LatexParserUtil"
+
+  extends                   = "mobi.hsz.idea.latex.psi.LatexElementImpl"
+
+  psiClassPrefix            = "Latex"
+  psiImplClassSuffix        = "Impl"
+  psiPackage                = "mobi.hsz.idea.latex.psi"
+  psiImplPackage            = "mobi.hsz.idea.latex.psi.impl"
+
+  elementTypeHolderClass    = "mobi.hsz.idea.latex.psi.LatexTypes"
+  elementTypeClass          = "mobi.hsz.idea.latex.psi.LatexElementType"
+  tokenTypeClass            = "mobi.hsz.idea.latex.psi.LatexTokenType"
+
+  tokens = [
+    LBRACE                  = "{"
+    RBRACE                  = "}"
+    LBRACKET                = "["
+    RBRACKET                = "]"
+    LPAREN                  = "("
+    RPAREN                  = ")"
+    COMMA                   = ","
+    COLON                   = ":"
+    ASTERISK                = "*"
+    LINE_BREAK              = '\\'
+
+    IDENTIFIER_BEGIN        = '\begin'
+    IDENTIFIER_END          = '\end'
+    IDENTIFIER              = "regexp:\\\p{Alpha}+"
+
+    ARG                     = "regexp:\b([^\[\]\{\}\(\),\\])+\b"
+    COMMENT                 = "regexp:%.*"
+
+    SPECIAL                 = "regexp:[\S]|\\."
+    CRLF                    = "regexp:[\s\r\n]+"
+  ]
+
+  extends("instruction.*")  = instruction
+  name("instruction.*")     = instruction
+  mixin("instruction.*")    = "mobi.hsz.idea.latex.psi.impl.LatexInstructionExtImpl"
+  mixin("section")          = "mobi.hsz.idea.latex.psi.impl.LatexSectionExtImpl"
+
+  mixin("argument")         = "mobi.hsz.idea.latex.psi.impl.LatexArgumentExtImpl"
+  implements("argument")    = "mobi.hsz.idea.latex.psi.LatexArgumentElement"
+}
+
+
+latexFile                       ::= item_ *
+private item_                   ::= !<<eof>> expr * { pin = 1 }
+private expr                    ::= section
+                                  | instruction
+                                  | argument_group
+                                  | text
+                                  | SPECIAL
+                                  | CRLF
+                                  | LINE_BREAK
+
+section                         ::= instruction_begin expr * instruction_end { pin = 1 }
+
+instruction_begin               ::= IDENTIFIER_BEGIN argument_brace argument_brace * { pin = 1 }
+instruction_end                 ::= IDENTIFIER_END   argument_brace { pin = 1 }
+instruction                     ::= IDENTIFIER       ASTERISK ? argument_group * { pin = 1 }
+
+text                            ::= ( ARG special_expr ? ) +
+
+private argument_group          ::= argument_bracket | argument_brace | argument_paren
+private argument_expr           ::= ( special_expr * ( ARG | section | instruction ) special_expr * ) * { pin(".*") = 2 }
+private special_expr            ::= SPECIAL | COLON | COMMA | LINE_BREAK | CRLF
+
+meta argument_bracket           ::= LBRACKET argument ? RBRACKET { pin(".*") = 1 elementType = argument }
+meta argument_brace             ::= LBRACE   argument ? RBRACE   { pin(".*") = 1 elementType = argument }
+meta argument_paren             ::= LPAREN   argument ? RPAREN   { pin(".*") = 1 elementType = argument }
+meta argument                   ::= <<sequence argument_expr special_expr>>
+
+private meta sequence           ::= <<p>> (<<q>> <<p>>) * { pin(".*") = 1 }
